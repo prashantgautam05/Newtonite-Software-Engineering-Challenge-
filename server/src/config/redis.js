@@ -1,0 +1,24 @@
+const Redis = require('ioredis');
+
+let redis = null;
+
+function getRedis() {
+  if (!redis) {
+    redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      maxRetriesPerRequest: 3,
+      retryDelayOnFailover: 100,
+      lazyConnect: true,
+    });
+
+    redis.on('error', (err) => {
+      console.error('Redis connection error:', err.message);
+    });
+
+    redis.on('connect', () => {
+      console.log('✓ Connected to Redis');
+    });
+  }
+  return redis;
+}
+
+module.exports = { getRedis };
